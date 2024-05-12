@@ -5,26 +5,38 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
 
+    public function index()
+    {
+        $users = User::all();
+        return response()->json($users, 200);
+    }
+
     public function register(Request $request)
     {
         $request->validate([
-            'name' => 'required',
-            'email' => 'required|email|unique:users',
-            'password' => 'required|min:6',
+            'name' => 'required|string',
+            'email' => 'required|email',
+            'password' => 'required|string|min:6',
         ]);
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => bcrypt($request->password),
-        ]);
+        try {
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+            ]);
 
-        return response()->json(['message' => 'User registered successfully'], 201);
+            return response()->json(['message' => 'Usuário registrado com sucesso'], 201);
+        } catch (\Illuminate\Database\QueryException $e) {
+                return response()->json(['message' => 'Email já cadastrado'], 500);
+        }
     }
+
 
     public function login(Request $request)
     {
@@ -42,8 +54,17 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        $request->user()->currentAccessToken()->delete();
-
-        return response()->json(['message' => 'Logged out'], 200);
+        if (!$request->user()) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+        if (!$request->user()->currentAccessToken() || empty($request->user()->currentAccessToken()->token)) {
+            return response()->json(['error' => 'User needs to be logged in'], 403);
+        }
+        $deleted = $request->user()->currentAccessToken()->delete();
+        if ($deleted) {
+            return response()->json(['message' => 'Logged out successfully'], 200);
+        } else {
+            return response()->json(['error' => 'Failed to logout'], 500);
+        }
     }
 }
