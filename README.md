@@ -24,4 +24,7 @@ See that I used the absolute file path to make things easier
 
 5 - Execute the command : php artisan key:generate
 
+6 - Execute the command : php artisan migrate (This will create the necessary tables)
+
+7 - up server : php artisan serve
 
