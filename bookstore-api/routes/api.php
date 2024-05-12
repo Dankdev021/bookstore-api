@@ -18,12 +18,14 @@ use App\Models\Book;
 |
 */
 
+Route::get('/login', [AuthController::class, 'home'])->name('login');
+
 Route::prefix('users')->group(function () {
-   // Route::post('/login', [AuthController::class, 'login'])->name('login');
-    Route::post('/login/up', [AuthController::class, 'login'])->name('login');
+    Route::post('/login/up', [AuthController::class, 'login'])->name('loginUp');
     Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
     Route::post('/register', [AuthController::class, 'register']);
     Route::get('/users', [AuthController::class, 'index'])->middleware('auth:sanctum');
+    Route::delete('/delete/{id}', [AuthController::class, 'destroy']);
 });
 
 

@@ -10,6 +10,11 @@ use Illuminate\Support\Facades\Hash;
 class AuthController extends Controller
 {
 
+    public function home()
+    {
+        return response()->json(['message' => 'API Laravel 8 Unauthorized - Log in'], 200);
+    }
+
     public function index()
     {
         $users = User::all();
@@ -31,9 +36,11 @@ class AuthController extends Controller
                 'password' => Hash::make($request->password),
             ]);
 
-            return response()->json(['message' => 'Usuário registrado com sucesso'], 201);
+            return response()->json(['message' => 'User registered successfully'], 201);
         } catch (\Illuminate\Database\QueryException $e) {
-                return response()->json(['message' => 'Email já cadastrado'], 500);
+                return response()->json(['message' => 'E-mail already registered
+
+                '], 500);
         }
     }
 
@@ -65,6 +72,18 @@ class AuthController extends Controller
             return response()->json(['message' => 'Logged out successfully'], 200);
         } else {
             return response()->json(['error' => 'Failed to logout'], 500);
+        }
+    }
+
+    public function destroy($id)
+    {
+        try {
+            $user = User::findOrFail($id);
+            $user->delete();
+        
+            return response()->json(['message' => 'User deleted successfully'], 200);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'User not found'], 404);
         }
     }
 }

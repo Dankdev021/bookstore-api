@@ -17,7 +17,9 @@ class StoreController extends Controller
 
         $store = Store::create($request->all());
 
-        return response()->json($store, 201);
+        return response()->json([
+            'message' => 'Store successfully create.'
+        ], 200);
     }
 
     public function index()
@@ -44,7 +46,9 @@ class StoreController extends Controller
 
         $store->update($request->all());
 
-        return response()->json($store);
+        return response()->json([
+            'message' => 'Store successfully updated.'
+        ], 200);
     }
 
     public function destroy($id)
@@ -53,7 +57,7 @@ class StoreController extends Controller
         $store->delete();
     
         return response()->json([
-            'message' => 'Loja excluída com sucesso.'
+            'message' => 'Store successfully deleted.'
         ], 200);
     }
 }
