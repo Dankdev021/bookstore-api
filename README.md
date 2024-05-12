@@ -9,3 +9,19 @@ Database used: SQLite (Due to the low complexity and aiming for better performan
 
 1 - To use this project just download the project from this repository
 
+1 - Just clone this repository using git clone <url_project>
+
+2 - Execute the command : composer install
+
+3 - Create the database.sqlite file inside the laravel database folder
+
+4 - Create .env file to add database settings Below is an example of what these settings will look like
+
+DB_CONNECTION=sqlite
+DB_DATABASE=/home/daniel/bookstore-api/bookstore-api/database/database.sqlite
+
+See that I used the absolute file path to make things easier
+
+5 - Execute the command : php artisan key:generate
+
+
