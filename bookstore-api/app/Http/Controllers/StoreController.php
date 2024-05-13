@@ -30,34 +30,42 @@ class StoreController extends Controller
 
     public function show($id)
     {
-        $store = Store::findOrFail($id);
+        $store = Store::find($id);
+
+        if (!$store) {
+            return response()->json(['message' => 'Store not found'], 404);
+        }
+
         return response()->json($store);
     }
 
     public function update(Request $request, $id)
     {
-        $store = Store::findOrFail($id);
+        $store = Store::find($id);
+
+        if (!$store) {
+            return response()->json(['message' => 'Store not found'], 404);
+        }
 
         $request->validate([
             'name' => 'required',
             'address' => 'required',
             'active' => 'required|boolean',
         ]);
-
+    
         $store->update($request->all());
-
-        return response()->json([
-            'message' => 'Store successfully updated.'
-        ], 200);
+        return response()->json(['message' => 'Store successfully updated'], 200);
     }
 
     public function destroy($id)
     {
-        $store = Store::findOrFail($id);
+        $store = Store::find($id);
+
+        if (!$store) {
+            return response()->json(['message' => 'Store not found'], 404);
+        }
+
         $store->delete();
-    
-        return response()->json([
-            'message' => 'Store successfully deleted.'
-        ], 200);
+        return response()->json(['message' => 'Store successfully deleted'], 200);
     }
 }

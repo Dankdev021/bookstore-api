@@ -29,19 +29,30 @@ Route::prefix('users')->group(function () {
 });
 
 
-Route::get('/books', function () {
-    $books = Book::with('store:id,name')->get();
-    return response()->json($books);
-})->middleware('auth:sanctum');
+Route::prefix('books')->group(function () {
+    Route::get('/list', function () {
+        $books = Book::with('store:id,name')->get();
+        return response()->json($books);
+    })->middleware('auth:sanctum');
+    
+    Route::get('/{id}', function ($id) {
+        $book = Book::with('store:id,name')->find($id);
+        if (!$book) {
+            return response()->json(['message' => 'Book not found'], 404);
+        }
+        return response()->json($book);
+    })->middleware('auth:sanctum');
+    Route::post('/register', [BookController::class, 'store'])->middleware('auth:sanctum');
+    Route::put('/update/{id}', [BookController::class, 'update'])->middleware('auth:sanctum');
+    Route::delete('/delete/{id}', [BookController::class, 'destroy'])->middleware('auth:sanctum');
+});
 
-Route::post('/books', [BookController::class, 'store'])->middleware('auth:sanctum');
-Route::get('/books/{id}', [BookController::class, 'show'])->middleware('auth:sanctum');
-Route::put('/books/{id}', [BookController::class, 'update'])->middleware('auth:sanctum');
-Route::delete('/books/{id}', [BookController::class, 'destroy'])->middleware('auth:sanctum');
 
+Route::prefix('stores')->group(function () {
+    Route::get('/list', [StoreController::class, 'index'])->middleware('auth:sanctum');
+    Route::get('/find/{id}', [StoreController::class, 'show'])->middleware('auth:sanctum');
+    Route::post('/register', [StoreController::class, 'store'])->middleware('auth:sanctum');
+    Route::put('/update/{id}', [StoreController::class, 'update'])->middleware('auth:sanctum');
+    Route::delete('/delete/{id}', [StoreController::class, 'destroy'])->middleware('auth:sanctum');
+});
 
-Route::get('/stores', [StoreController::class, 'index'])->middleware('auth:sanctum');
-Route::get('/stores/find/{id}', [StoreController::class, 'show'])->middleware('auth:sanctum');
-Route::post('/stores/registry', [StoreController::class, 'store'])->middleware('auth:sanctum');
-Route::put('/stores/update/{id}', [StoreController::class, 'update'])->middleware('auth:sanctum');
-Route::delete('/stores/delete/{id}', [StoreController::class, 'destroy'])->middleware('auth:sanctum');

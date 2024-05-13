@@ -28,19 +28,32 @@ class AuthController extends Controller
             'email' => 'required|email',
             'password' => 'required|string|min:6',
         ]);
-
+    
         try {
-            $user = User::create([
-                'name' => $request->name,
-                'email' => $request->email,
-                'password' => Hash::make($request->password),
-            ]);
-
-            return response()->json(['message' => 'User registered successfully'], 201);
+            // Verificar se o usuário já existe pelo email
+            $user = User::where('email', $request->email)->first();
+    
+            // Se o usuário não existir, criar um novo
+            if (!$user) {
+                // Criar o usuário
+                $user = User::create([
+                    'name' => $request->name,
+                    'email' => $request->email,
+                    'password' => Hash::make($request->password),
+                ]);
+    
+                // Gerar um token de acesso para o novo usuário
+                $token = $user->createToken('API Token')->plainTextToken;
+    
+                // Retornar uma resposta com o token de acesso e uma mensagem de sucesso
+                return response()->json(['token' => $token, 'message' => 'User registered successfully'], 201);
+            } else {
+                // Se o usuário já existir, retornar uma mensagem indicando que o email já está em uso
+                return response()->json(['message' => 'Email already registered'], 400);
+            }
         } catch (\Illuminate\Database\QueryException $e) {
-                return response()->json(['message' => 'E-mail already registered
-
-                '], 500);
+            // Se ocorrer um erro durante o processo, retornar uma mensagem de erro
+            return response()->json(['message' => 'Internal Server Error'], 500);
         }
     }
 
@@ -51,8 +64,9 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials)) {
             $user = Auth::user();
+            $user->tokens()->delete();
             $token = $user->createToken('API Token')->plainTextToken;
-
+    
             return response()->json(['token' => $token], 200);
         } else {
             return response()->json(['message' => 'Unauthorized'], 401);
@@ -77,13 +91,12 @@ class AuthController extends Controller
 
     public function destroy($id)
     {
-        try {
-            $user = User::findOrFail($id);
-            $user->delete();
-        
-            return response()->json(['message' => 'User deleted successfully'], 200);
-        } catch (\Exception $e) {
+        $user = User::find($id);
+        if (!$user) {
             return response()->json(['message' => 'User not found'], 404);
         }
+    
+        $user->delete();
+        return response()->json(['message' => 'User deleted successfully'], 200);
     }
 }
