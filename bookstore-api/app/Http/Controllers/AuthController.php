@@ -30,29 +30,20 @@ class AuthController extends Controller
         ]);
     
         try {
-            // Verificar se o usuário já existe pelo email
             $user = User::where('email', $request->email)->first();
-    
-            // Se o usuário não existir, criar um novo
             if (!$user) {
-                // Criar o usuário
                 $user = User::create([
                     'name' => $request->name,
                     'email' => $request->email,
                     'password' => Hash::make($request->password),
                 ]);
-    
-                // Gerar um token de acesso para o novo usuário
                 $token = $user->createToken('API Token')->plainTextToken;
-    
-                // Retornar uma resposta com o token de acesso e uma mensagem de sucesso
+
                 return response()->json(['token' => $token, 'message' => 'User registered successfully'], 201);
             } else {
-                // Se o usuário já existir, retornar uma mensagem indicando que o email já está em uso
                 return response()->json(['message' => 'Email already registered'], 400);
             }
         } catch (\Illuminate\Database\QueryException $e) {
-            // Se ocorrer um erro durante o processo, retornar uma mensagem de erro
             return response()->json(['message' => 'Internal Server Error'], 500);
         }
     }
