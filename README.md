@@ -28,3 +28,9 @@ See that I used the absolute file path to make things easier
 
 7 - up server : php artisan serve
 
+
+NOTE : The route documentation for this project can be very useful when testing as the routes are named and can help with this
+
+NOTE : If you are using postman to test, remember to always define the baraer token in the routes
+(token obtained when logging in)
+
